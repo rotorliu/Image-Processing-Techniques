@@ -73,6 +73,27 @@ class FourierTransform() :
         exp_1 = pow(np.e, -2j*np.pi*u*x/M)
         exp_2 = pow(np.e, -2j*np.pi*v*y/N)
         self.F = np.dot(exp_2, np.dot(exp_1,self.image).transpose())/(M*N)
+
+        # [rows, cols] = self.F.shape
+        # D = min(rows, cols)//2
+        # for m in range(rows) :
+        #     for n in range(cols) :
+        #         if not ((D > np.sqrt((m - 0)**2 + (n - 0)**2) > 0) or 
+        #            (D > np.sqrt((m - rows)**2 + (n - cols)**2) > 0) or
+        #            (D > np.sqrt((m - 0)**2 + (n - cols)**2) > 0) or
+        #            (D > np.sqrt((m - rows)**2 + (n - 0)**2) > 0)):
+        #             self.F[m,n] = 0
+
+        
+        [rows, cols] = self.F.shape
+        D = min(rows, cols)//2
+        for m in range(rows) :
+            for n in range(cols) :
+                if(np.sqrt((m - rows//2)**2 + (n - cols//2)**2) < D):
+                    self.F[m,n] = 0
+
+        [rows, cols] = self.F.shape
+
         return self.F
 
     def inverseTransform(self) :
@@ -97,8 +118,8 @@ class FourierTransform() :
         except :
             print("Internal Error! Could not decompose the image shape")
             return
-        m = M/2
-        n = N/2
+        m = M//2
+        n = N//2
         temp = np.zeros((M,N))
         temp[-m:,-n:] = np.abs(np.copy(image[:m,:n]))
         temp[-m:,:-n] = np.abs(np.copy(image[:m,n:]))
